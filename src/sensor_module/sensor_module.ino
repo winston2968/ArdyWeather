@@ -3,9 +3,6 @@
 // ===========================================================================
 
 
-
-
-
 // ------------ Import and define pin ------------
 
 #include <TimerFour.h>
@@ -13,7 +10,7 @@
 
 int RF_TX_PIN = 4;  // Sedding pin 
 
-char msg[] = "190 Coucou c'est moi";
+char msg[] = "190 Coucou";
 
 // ------------ Functions ------------
 
@@ -40,6 +37,7 @@ void send_data(void) {
   Serial.println("--------- Envoi d'un message --------");
   Serial.println(3 + msg); 
   vw_send((uint8_t *)msg, 1 + strlen(msg));
+  vw_wait_tx();
   Serial.println("envoyé");
 }
 
@@ -51,6 +49,7 @@ void setup() {
   // Radio Init for sender
   Serial.begin(9600);
   vw_set_tx_pin(RF_TX_PIN);
+  vw_setup(2000);
 
   // Init Timer 
   // Timer4.initialize(1000000);
@@ -64,7 +63,7 @@ void setup() {
 
 void loop() {
   send_data();
-  delay(1000);
+  delay(3000);
 }
 
 
