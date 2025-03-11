@@ -5,6 +5,7 @@
 \usepackage[utf8]{inputenc}
 
 
+
 \begin{document}
 
 
@@ -33,6 +34,8 @@ Pour celui-ci, nous allons essayer de faire une station météo composée de deu
 \begin{itemize}
     \item \textbf{Le capteur : } composé d'une carte arduino munie de capteurs (ex : température, humidité...) et d'un émetteur/récepteur 
     radio pour envoyer les relevés à la station fixe. 
+    Pour le capteur, on utilise un {capteur de température et d'humidité Grove} permettant 
+    une connexion facile à la carte. 
     \item \textbf{La station fixe : } Composée d'un arduino recevant les données émises par le capteur et les envoie en filaire 
     à un carte type raspberry pour un affichage sur écran/interface web. 
 \end{itemize}
@@ -41,6 +44,9 @@ Toutes les informations techniques relatives au projet (code, bibliothèques) so
 \begin{center}
     \href{https://github.com/winston2968/ArdyWeather.git}{https://github.com/winston2968/ArdyWeather.git}
 \end{center}
+
+L'objectif est de programmer la station pour qu'elle puisse interragir avec plusieurs 
+stations. 
 
 
 \end{document}

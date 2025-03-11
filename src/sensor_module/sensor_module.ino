@@ -2,6 +2,15 @@
 //                      Sensor Module Code
 // ===========================================================================
 
+/*
+
+  Envoi des données (température et humidité) toutes les 10 secondes 
+  à la station pour permettre un suivi régulier. 
+
+
+*/
+
+
 
 // ------------ Import and define pin ------------
 
@@ -10,7 +19,13 @@
 
 int RF_TX_PIN = 4;  // Sedding pin 
 
+// Testing tables 
+// float temp_table = {17.00, 9.00, 11.01, 10.02, 11.09, 31.01, 24.23, 17.11, 18.45, 46.02}; 
+
+
 char msg[] = "190 10,02,31,37,21,17,09";
+
+char HEXA_TABLE[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 // ------------ Functions ------------
 
@@ -22,9 +37,8 @@ float* get_temp(int length) {
   return temp;
 }
 
-String convert_temp_array(float* temp) {
-  String temp_string = "";
-  return temp_string ;
+String convert_to_HEX(int num) {
+  return String(num, HEX); 
 }
 
 void send_data(void) {
@@ -56,14 +70,17 @@ void setup() {
   // Timer4.attachInterrupt(send_data);
 
   // delete[] values;
+
+  Serial.println(convert_to_HEX(590));
+  Serial.println(convert_to_HEX(100));
 }
 
 
 // ------------ Loop ------------
 
 void loop() {
-  send_data();
-  delay(3000);
+  // send_data();
+  // delay(3000);
 }
 
 
