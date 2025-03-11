@@ -10,7 +10,7 @@
 
 int RF_TX_PIN = 4;  // Sedding pin 
 
-char msg[] = "190 Coucou";
+char msg[] = "190 10,02,31,37,21,17,09";
 
 // ------------ Functions ------------
 
