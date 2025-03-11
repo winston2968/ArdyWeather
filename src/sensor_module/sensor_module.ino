@@ -3,52 +3,70 @@
 // ===========================================================================
 
 
+
+
+
 // ------------ Import and define pin ------------
 
-#include <TimerThree.h>
+#include <TimerFour.h>
 #include <VirtualWire.h>
 
-int RF_RX_PIN = 4;  // Reception pin
+int RF_TX_PIN = 4;  // Sedding pin 
+
+char msg[] = "190 Coucou c'est moi";
 
 // ------------ Functions ------------
 
+float* get_temp(int length) {
+  float* temp = new float[length]; 
+  for (int i = 0; i < length; i++) {
+    temp[i] = random(-2, 40);
+  }
+  return temp;
+}
+
+String convert_temp_array(float* temp) {
+  String temp_string = "";
+  return temp_string ;
+}
+
+void send_data(void) {
+  // Get info from sensors
+
+  // Convert info into string values
+
+  // Send infos to the station
+  Serial.println("");
+  Serial.println("--------- Envoi d'un message --------");
+  Serial.println(3 + msg); 
+  vw_send((uint8_t *)msg, 1 + strlen(msg));
+  Serial.println("envoyé");
+}
 
 // ------------ Setup ------------
 
-void setup(){
+void setup() {
   Serial.begin(9600);
-  vw_set_rx_pin(RF_RX_PIN);  // Init Reception Broch
-  vw_setup(2000); // Transmission Speed
-  vw_rx_start(); // Starting Receiving
+  
+  // Radio Init for sender
+  Serial.begin(9600);
+  vw_set_tx_pin(RF_TX_PIN);
 
+  // Init Timer 
+  // Timer4.initialize(1000000);
+  // Timer4.attachInterrupt(send_data);
+
+  // delete[] values;
 }
 
 
 // ------------ Loop ------------
 
 void loop() {
-  uint8_t buf[VW_MAX_MESSAGE_LEN];
-  uint8_t buflen = VW_MAX_MESSAGE_LEN;
-  if (vw_get_message(buf, &buflen)) {
-    int i;
-    // si on a reçu un message
-    Serial.print("Reçu : ");
-    for (i = 0; i < buflen; i++) {
-      Serial.print(buf[i], HEX);
-      Serial.print(" ");
-    }
-    Serial.println("");
-
-    // Décodage du message 
-    Serial.print("Protocole : ") ;
-    Serial.println(char(buf[0]));
-    Serial.print("Emetteur : ");
-    Serial.println(char(buf[1]));
-    Serial.print("Destinataire : ");
-    Serial.println(char(buf[2]));
-    for (int i = 0; i < 25 ; i++) {
-      Serial.print(char(buf[i]));
-    }
-    Serial.println("");
-  }
+  send_data();
+  delay(1000);
 }
+
+
+
+
