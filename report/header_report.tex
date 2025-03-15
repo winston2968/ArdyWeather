@@ -1,4 +1,9 @@
-% Use documentclass{article}
+
+
+\usepackage[top=3cm, bottom=3cm, left=3.5cm, right=3.5cm]{geometry}
+
+
+\setlength{\parindent}{0cm}
 
 
 \usepackage[english]{babel}
@@ -12,15 +17,15 @@
 \usepackage{multicol}
 \usepackage{lipsum} 
 \usepackage{graphicx}
-% \usepackage{stmaryrd}
+\usepackage{stmaryrd}
 \usepackage{systeme}
 \usepackage{wrapfig}
 \usepackage{colortbl}
 \usepackage{cellspace}
+\usepackage{stmaryrd}
 \usepackage{ntheorem}
 \usepackage{lmodern}
 \usepackage{mathtools}
-\usepackage{wrapfig}
 \usepackage{ragged2e}
 \usepackage{tabularx}
 \usepackage{titlepic}
@@ -35,21 +40,23 @@
 \usepackage{tikz}
 \usepackage{mdframed}
 \usepackage{xparse} % Nécessaire pour définir des environnements avec arguments optionnels
-\usepackage[top=3cm, bottom=3cm, left=3.5cm, right=3.5cm]{geometry}
+\usepackage{booktabs}  % Pour des tableaux plus jolis
+\usepackage{tocloft}
 
-% \setcounter{secnumdepth}{-1} % Désactive le compteur des parties
+
 
 % PAGE SETTINGS
 
 % \justifying
 
-% \setlength{\columnseprule}{1pt}
-% \def\columnseprulecolor{\color{black}}
 
 \newcolumntype{C}{>{$\displaystyle}Sc<$}
 \cellspacetoplimit=5pt
 \cellspacebottomlimit=5pt
 
+\setcounter{tocdepth}{1} % N'affiche que les sections (niveau 1)
+\setlength{\cftsecnumwidth}{2em} % Largeur des numéros de section
+\setlength{\cftsecindent}{0em}   % Pas d'indentation pour les sections
 
 % MATHS SHORTHANDS
 
@@ -95,24 +102,13 @@
   \end{mdframed}
 }
 
-% Définir un environnement pour encadrer les corollaires
-\NewDocumentEnvironment{corollary}{O{}}
-{
-  \begin{mdframed}[linewidth=1pt,linecolor=gray,backgroundcolor=gray!10,roundcorner=5pt]
-  \textbf{Corollaire}%
-  \IfNoValueTF{#1}{}{~(\textbf{#1})} % Affiche le titre entre parenthèses et en gras s'il est fourni
-  . % Point à la fin
-}
-{
-  \end{mdframed}
-}
-				
 
 \theoremstyle{plain}
 \newtheorem*{remark}{Remarque}
 \newtheorem*{proposition}{Proposition}
 \newtheorem*{lemma}{Lemme}
 \newtheorem*{prop}{Propriété}
+\newtheorem*{corollary}{Corollaire}
 \newtheorem*{proof}{Démonstration}
 \newtheorem*{example}{Exemple}
 
@@ -120,9 +116,39 @@
 % OTHERS 
 
 
-%\newlength\tindent
-%\setlength{\tindent}{\parindent}
-%\setlength{\parindent}{0pt}
-%\renewcommand{\indent}{\hspace*{\tindent}}
+\newlength\tindent
+\setlength{\tindent}{\parindent}
+\setlength{\parindent}{0pt}
+\renewcommand{\indent}{\hspace*{\tindent}}
 
-% Put begin and end document 
+
+\usepackage{fancyvrb}
+\usepackage{tikz-cd} 
+\usepackage{amsmath}
+\usepackage{mathrsfs}  
+\usepackage{amssymb}
+\usepackage{tkz-graph}
+\usepackage{caption}
+\usepackage{multicol}
+\usepackage{listings} % Importation du package listings
+\usepackage{xcolor} % Pour ajouter de la couleur
+
+\setlength{\columnsep}{1cm} % Espace entre les colonnes
+
+
+% Définition du style de l'en-tête
+\pagestyle{fancy}
+\fancyhf{} % Nettoyer les en-têtes et pieds de page
+
+% Gauche : Nom de la section
+\fancyhead[L]{\nouppercase{\leftmark}}
+
+% Droite : Logo
+\fancyhead[R]{\includegraphics[width=2cm]{./images/logo_jfc.png}}
+
+% Ligne sous l'en-tête
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlength{\headheight}{1.5cm} % Ajuste la hauteur de l'en-tête
+
+
