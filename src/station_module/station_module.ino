@@ -16,10 +16,9 @@ int RF_RX_PIN = 4;  // Reception pin
 
 void setup(){
   Serial.begin(9600);
-  vw_set_rx_pin(RF_RX_PIN);  // Init Reception Broch
-  vw_setup(2000); // Transmission Speed
-  vw_rx_start(); // Starting Receiving
-
+  vw_set_rx_pin(RF_RX_PIN);   // Init Reception Broch
+  vw_setup(2000);             // Transmission Speed
+  vw_rx_start();              // Starting Receiving
 }
 
 
@@ -39,12 +38,12 @@ void loop() {
     Serial.println("");
 
     // Décodage du message 
-    Serial.print("Protocole : ") ;
-    Serial.println(char(buf[0]));
-    Serial.print("Emetteur : ");
-    Serial.println(char(buf[1]));
-    Serial.print("Destinataire : ");
-    Serial.println(char(buf[2]));
+    // Serial.print("Protocole : ") ;
+    // Serial.println(char(buf[0]));
+    // Serial.print("Emetteur : ");
+    // Serial.println(char(buf[1]));
+    // Serial.print("Destinataire : ");
+    // Serial.println(char(buf[2]));
     for (int i = 0; i < 25 ; i++) {
       Serial.print(char(buf[i]));
     }
