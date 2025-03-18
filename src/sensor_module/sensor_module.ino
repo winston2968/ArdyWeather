@@ -11,7 +11,6 @@
 */
 
 
-
 // ------------ Import and define pin ------------
 
 #include <TimerFour.h>
@@ -20,26 +19,43 @@
 int RF_TX_PIN = 4;  // Sedding pin 
 
 // Testing tables 
-// float temp_table = {17.00, 9.00, 11.01, 10.02, 11.09, 31.01, 24.23, 17.11, 18.45, 46.02}; 
+float temp_table[] = {17.00, 9.00, 11.01, 10.02, 11.09, 31.01, 24.23, 17.11, 18.45, 46.02}; 
 
+// Testing message
+char msg[] = "101 Coucou c'est moi" ;
 
-char msg[] = "190 10,02,31,37,21,17,09";
-
-char HEXA_TABLE[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+// Max radio datagram length
+int max_length = 10 ;
 
 // ------------ Functions ------------
 
-float* get_temp(int length) {
-  float* temp = new float[length]; 
-  for (int i = 0; i < length; i++) {
-    temp[i] = random(-2, 40);
+/*
+  Convert float temperature table to char table to send it throught radio. 
+  It get a fixed 3 length float table. 
+*/
+String convert_temp_table_to_ASCII_table(float temp_table[]) {
+
+  // Calculate string table length
+  int length = (sizeof(temp_table) / sizeof(temp_table[0])) ; 
+  // Create table 
+  char string_table[length*3]; 
+
+  // Convert float values
+  for (int i = 0; i < length ; i++) {
+    int value = temp_table[i] * 100;
+    
+    // Convert to char
+    char c1 = (value / 91) + 33 ;
+    char c2 = ((value % 91) / 10) + 33;
+    char c3 = (value % 10) + 33 ;
+
+    char concatenate[] = {c1,c2,c3}; 
+    string_table[i] = concatenate ;
+
+    Serial.println(string_table);
   }
-  return temp;
 }
 
-String convert_to_HEX(int num) {
-  return String(num, HEX); 
-}
 
 void send_data(void) {
   // Get info from sensors
@@ -69,10 +85,8 @@ void setup() {
   // Timer4.initialize(1000000);
   // Timer4.attachInterrupt(send_data);
 
-  // delete[] values;
+  convert_temp_table_to_ASCII_table(temp_table);
 
-  Serial.println(convert_to_HEX(590));
-  Serial.println(convert_to_HEX(100));
 }
 
 
