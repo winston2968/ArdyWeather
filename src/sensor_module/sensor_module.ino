@@ -3,15 +3,17 @@
 // ===========================================================================
 
 /*
-
-  Envoi des données (température et humidité) toutes les 10 secondes 
-  à la station pour permettre un suivi régulier. 
-
-  Problème : La conversion ne fonctionne pas bien, 
-  toutes les valeurs de temp_table ne sont pas converties. 
+  Get temperature and humidity with GrooveSensor each delay int value. 
+  Send datas throught radio with VirtualWire.
 */
 
-// ------------ Import and define pin ------------
+// ==========================================================================
+// Include Libraries 
+
+#include <TH06_dev.h>
+#include "Arduino.h"
+#include "Wire.h"
+#include "THSensor_base.h"
 
 #include <TimerFour.h>
 #include <VirtualWire.h>
