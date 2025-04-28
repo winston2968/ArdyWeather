@@ -10,10 +10,10 @@
 // ==========================================================================
 // Include Libraries 
 
-#include <TH06_dev.h>
+// #include <TH06_dev.h>
 #include "Arduino.h"
 #include "Wire.h"
-#include "THSensor_base.h"
+// #include "THSensor_base.h"
 
 #include <TimerFour.h>
 #include <VirtualWire.h>
