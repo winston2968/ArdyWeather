@@ -19,12 +19,12 @@ int reception_pin = 2;  // Reception pin
 
 // Communication Variables
 
-static char SENSOR_NUM = '1';
+static char SENSOR_NUM = '2';
 volatile int nb_ack = 0;
 volatile int nb_sent = 0;
 volatile bool must_send = false;  // <-- Flag to ask for sending 
 
-char datagram_type[] = {'A', 'W', '0', SENSOR_NUM, '0', '0', '0'}; 
+char datagram_type[] = {'A', 'W', '1', SENSOR_NUM, '0', '0', '0'}; 
 char datas_example[] = {'H','G','F','D','J','I','Z','J','C','K','J','B','Q','K','B','Z','S','B'};
 
 char datagram[27]; // <- One static datagram
@@ -59,7 +59,7 @@ void build_datagram() {
 
   datagram[0] = datagram_type[0];
   datagram[1] = datagram_type[1];
-  datagram[2] = '0'; // Target
+  datagram[2] = '1'; // Target
   datagram[3] = SENSOR_NUM; 
   datagram[4] = 'D'; // Type
   datagram[5] = '0' + nb_sent;
