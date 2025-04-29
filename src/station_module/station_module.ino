@@ -47,6 +47,7 @@ void loop() {
     for (int i = 0; i < 25 ; i++) {
       Serial.print(char(buf[i]));
     }
-    Serial.println("");
+    Serial.println("coucou");
+
   }
 }
