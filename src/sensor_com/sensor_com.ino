@@ -21,6 +21,7 @@ int reception_pin = 2;  // Reception pin
 
 static char SENSOR_NUM = '2';
 volatile int nb_ack = 0;
+volatile int nb_ack_station = 0; 
 volatile int nb_sent = 0;
 volatile bool must_send = false;  // <-- Flag to ask for sending 
 
@@ -117,6 +118,9 @@ void datagram_decoding(char* received_msg) {
   if (datagram_type == 'A') {
     Serial.print("Acquitement Datagram for: "); 
     Serial.println(nb_ack_msg); 
+    nb_ack_station = nb_ack_msg ;       // Update station received datagrams
+    Serial.println("---| Actual ack number: "); 
+    Serial.println(nb_ack_station); 
   } 
 }
 
@@ -136,20 +140,33 @@ void setup() {
   // Sendding Pin
   vw_set_tx_pin(sendding_pin);
   vw_setup(2000);
-  Serial.println("Sendding Ready ! "); 
+  Serial.println("Sending Ready ! "); 
 
-  Timer4.initialize(2000000); // 200 ms
-  Timer4.attachInterrupt(on_timer);
+  // Timer4.initialize(2000000); // 200 ms
+  // Timer4.attachInterrupt(on_timer);
 }
 
 void loop() {
 
   // Sendding datagram 
 
-  if (must_send) {
+  if (nb_ack_station == nb_sent) {
+    // Station had received all datagrams 
+    // we send the following 
+
+    Serial.print("Nb Ack Station: "); 
+    Serial.println(nb_ack_station); 
+    Serial.print("Nb Sent: "); 
+    Serial.println(nb_sent); 
+
+    send_datagram();
+
     Serial.println("Sendding Datagram"); 
     must_send = false; // reset the flag
     send_datagram();
+  } else {
+    // Serial.print("Waiting for acquitment nb :"); 
+    // Serial.println(nb_sent); 
   }
 
   // Acquitement Reception
@@ -159,16 +176,17 @@ void loop() {
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
   
   if (vw_get_message(buf, &buflen)) {
-    Serial.println("Message reçu !");
+    Serial.println("==> Datagram Received !");
     
     char* received_msg = (char*) malloc(buflen);
     memset(received_msg, 0, buflen);
     
-    Serial.print("---| Texte: ");
+    Serial.print("---| Text: ");
     for (int i = 0; i < buflen; i++) {
       Serial.print((char)buf[i]);
       received_msg[i] = (char) buf[i]; 
     }
+
     Serial.println(""); 
 
     if (received_msg[2] == SENSOR_NUM) {

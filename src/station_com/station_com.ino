@@ -41,9 +41,9 @@ int storage_count = 0;                 // To fill-in the storage table
 
 // Priority Queue for storing message to acquit
 
-#define ACK_QUEUE_SIZE 20 
-char ack_queue[ACK_QUEUE_SIZE];   // To keep datagram number to acquit 
-int ack_count = 0; 
+// #define ACK_QUEUE_SIZE 20 
+// char ack_queue[ACK_QUEUE_SIZE];   // To keep datagram number to acquit 
+// int ack_count = 0; 
 
 // ==========================================================================
 // Storage Functions 
@@ -107,25 +107,52 @@ void datagram_decoding(char* received_msg) {
 
   } else {
     // Adding datagram to queue for acquitment
-    add_ack_to_queue(received_msg); 
+    // add_ack_to_queue(received_msg); 
 
     // Save datas 
     add_to_storage(received_msg); 
+
+    // Respond to datagram to receive the others 
+    send_acquitement(msg_emetor, nb_sent_msg); 
   }
 
 }
 
-void send_acquitement(char target, int nb_ack) {
+void send_acquitement(char target, int nb_ack_arg) {
 
-  datagram[2] = target ; 
-  datagram[4] = 'A'; 
-  datagram[6] = '0' + nb_ack ;
+  delay(500); 
+
+  // Update current nb_ack
+  nb_ack = nb_ack_arg ;
+
+  if (nb_ack = 30) {
+    nb_ack = 1 ;
+  }
+
+  datagram[0] = 'A';
+  datagram[1] = 'W';
+  datagram[2] = target;
+  datagram[3] = STATION_NUM;
+  datagram[4] = 'A';
+  datagram[5] = '0';                               // Not used here
+  datagram[6] = '0' + nb_ack_arg;
+  for (int i = 7; i < 27; i++) datagram[i] = '0';  // Clean datas 
+
+  Serial.println("===> Sending Acquitement Datagram :"); 
+  for (int i = 0; i < 27; i++) {
+    Serial.print(datagram[i]); 
+    Serial.print(" "); 
+  }
+  Serial.println(""); 
 
   vw_send((uint8_t *)datagram, 27);
   vw_wait_tx();
+
+  Serial.print("===> Acquitement Send for datagram ");
+  Serial.println(datagram[6]); 
 }
 
-
+/* 
 // Acquitment Queue 
 
 void add_ack_to_queue(char* received_msg) {
@@ -158,10 +185,12 @@ void process_ack_queue() {
 
     nb_ack += 1;
     send_acquitement('2', nb_ack);
-    Serial.println("===> Message acquitted from queue");
+    Serial.print("===> Message acquitted from queue for datagram ");
+    Serial.println(nb_ack); 
   }
 }
 
+*/
 
 // ==========================================================================
 // Setup and Loop
@@ -171,17 +200,22 @@ void setup() {
   Serial.begin(9600);
 
   // Reception init
-  Serial.println("Reception Ready ! ");
   vw_set_rx_pin(reception_pin);
   vw_setup(2000);
   vw_rx_start();
+  Serial.println("Reception Ready ! ");
 
   // Sendding init 
   vw_set_tx_pin(sendding_pin);
   Serial.println("Sedding Ready ! "); 
+
+  // Log info
+  Serial.print("Storage Count: "); 
+  Serial.println(storage_count); 
 }
 
 void loop() {
+
 
   // Read received message 
   uint8_t buf[VW_MAX_MESSAGE_LEN];
@@ -191,15 +225,8 @@ void loop() {
     Serial.println("==> Datagram Received !");
     char* received_msg = (char*) malloc(buflen);
     memset(received_msg, 0, buflen);
-
-    /* 
-    for (int i = 0; i < buflen; i++) {
-      Serial.print(buf[i], HEX);
-      Serial.print(" ");
-    }
-    Serial.println(""); */
     
-    Serial.print("Texte: ");
+    Serial.print("---| Text: ");
     for (int i = 0; i < buflen; i++) {
       Serial.print((char)buf[i]);
       received_msg[i] = (char) buf[i]; 
@@ -211,16 +238,19 @@ void loop() {
     } else {
       Serial.println("---| Datagram not for me..."); 
     }
-    Serial.println(received_msg[2]); 
 
     free(received_msg); 
 
-    Serial.println("");
+    Serial.println(""); 
 
-    process_ack_queue();
     
   } 
-}
+
+
+    // send_acquitement('2', 2); 
+
+    // delay(1000); 
+} 
 
 
 
