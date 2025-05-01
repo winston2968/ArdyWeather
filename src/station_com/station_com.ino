@@ -3,9 +3,9 @@
 // ===========================================================================
 
 /*
-  Communication Protocol
-
-  TODO : ajouter une file pour stocker les messages à acquitter. 
+  Communication Protocol for ArdyWeather Station : 
+    - Acquit all datagram received to a specific sensor. 
+    - Save datas from data type datagrams in RAM
 */
 
 
@@ -35,15 +35,9 @@ char datagram[] = {'A', 'W', '0', STATION_NUM, '0', '0', '0', '0','0','0','0','0
 
 // Storage Variables 
 
-#define STORAGE_SIZE 800
+#define STORAGE_SIZE 1000
 char storage_table[STORAGE_SIZE];     // Datas storage 
 int storage_count = 0;                 // To fill-in the storage table
-
-// Priority Queue for storing message to acquit
-
-// #define ACK_QUEUE_SIZE 20 
-// char ack_queue[ACK_QUEUE_SIZE];   // To keep datagram number to acquit 
-// int ack_count = 0; 
 
 // ==========================================================================
 // Storage Functions 
@@ -120,7 +114,7 @@ void datagram_decoding(char* received_msg) {
 
 void send_acquitement(char target, int nb_ack_arg) {
 
-  delay(500); 
+  // delay(500); 
 
   // Update current nb_ack
   nb_ack = nb_ack_arg ;
@@ -245,11 +239,6 @@ void loop() {
 
     
   } 
-
-
-    // send_acquitement('2', 2); 
-
-    // delay(1000); 
 } 
 
 
