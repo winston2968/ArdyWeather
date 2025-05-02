@@ -115,6 +115,7 @@ void datagram_decoding(char* received_msg) {
     // It's an acquitement datagram, nothing to do
     nb_ack_other = nb_ack_msg; 
     nb_tables_stack -= 1; 
+    display_merged_table(); 
   } else {
     // We need to acquit the received datagram
     nb_ack = nb_send_msg; 

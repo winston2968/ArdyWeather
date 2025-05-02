@@ -61,7 +61,7 @@ void setup() {
 
 
   // Hum and Temp Timer 
-  Timer3.initialize(100000);
+  Timer3.initialize(1000000);
   Timer3.attachInterrupt(set_update_temp_hum_flag);  
   Serial.println("Starting Getting Weather Values !"); 
 
