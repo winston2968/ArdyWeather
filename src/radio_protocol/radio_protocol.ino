@@ -20,6 +20,30 @@
   - Datas : Datas if it's a Datas type datagram. 
 */
 
+#include "Wire.h"
+#include <TimerFour.h>
+#include <VirtualWire.h>
+
+
+// =========================================================================
+// Global Variables 
+
+#define is_station true 
+#define datagram_size 27 
+int sending_pin = 8; 
+int reception_pin = 2; 
+char MODULE_NUM ; 
+char DEST_NUM ; 
+volatile int nb_ack = 0;
+volatile int nb_send = 0; 
+int nb_ack_other = 0; 
+char datagram[datagram_size]; 
+char last_datagram[datagram_size]; 
+volatile bool send_datagram_flag = false ; 
+
+// Test variables 
+int STATION_NUM = '0'; 
+int SENSOR_NUM = '1'; 
 
 // =========================================================================
 // Radio Protocol functions 
@@ -33,10 +57,6 @@ void build_datagram(char destination, char datagram_type, char datas_type) {
   if (datagram_type == 'D') {
       nb_send += 1; 
   }
-  if (nb_send == 30) {
-    nb_send = 0; 
-  }
-
   // Define datagram header
   datagram[0] = 'A'; 
   datagram[1] = 'W'; 
@@ -47,11 +67,7 @@ void build_datagram(char destination, char datagram_type, char datas_type) {
   datagram[6] = '0' + nb_send; 
   datagram[7] = '0' + nb_ack;  
   // Fill-in datas 
-  Serial.print("Tables Stack : ");
-  Serial.println(nb_tables_stack);
-  for (int i = 0; i < 18; i++) {
-    datagram[i+8] = merged_table[i + (18 * (nb_tables_stack - 1))];
-  }
+  // TODO : depends on module 
 }
 
 /*
@@ -59,10 +75,6 @@ void build_datagram(char destination, char datagram_type, char datas_type) {
 */
 void send_datagram() {
   // Get/build datagram to send 
-  Serial.print("Nb Send: "); 
-  Serial.println(nb_send); 
-  Serial.println("Nb Ack Other: "); 
-  Serial.println(nb_ack_other); 
   if (nb_send == nb_ack_other) {
     // We can send a new datagram
     build_datagram(DEST_NUM, 'D', 'T'); 
@@ -70,7 +82,7 @@ void send_datagram() {
   } else {
     // We need to re-send last datagram
     memcpy(datagram, last_datagram, datagram_size); 
-    Serial.println("Re-sending last datagram"); 
+    Serial.println("Re-sending lest datagram"); 
   }
   // Send datagram 
   vw_send((uint8_t *)datagram, datagram_size);
@@ -95,8 +107,8 @@ void datagram_decoding(char* received_msg) {
   char msg_emetor = received_msg[3]; 
   char datagram_type = received_msg[4]; 
   char datas_type = received_msg[5]; 
-  int nb_send_msg = received_msg[6] - '0'; 
-  int nb_ack_msg = received_msg[7] - '0'; 
+  char nb_send_msg = received_msg[6] - '0'; 
+  char nb_ack_msg = received_msg[7] - '0'; 
   // Display values 
   Serial.print("Destination: "); 
   Serial.println(msg_dest); 
@@ -113,8 +125,7 @@ void datagram_decoding(char* received_msg) {
   // Acquitement generation 
   if (datagram_type == 'A') {
     // It's an acquitement datagram, nothing to do
-    nb_ack_other = nb_ack_msg; 
-    nb_tables_stack -= 1; 
+    nb_ack_other = nb_send_msg; 
   } else {
     // We need to acquit the received datagram
     nb_ack = nb_send_msg; 
@@ -143,6 +154,68 @@ void send_acquitment() {
 void set_send_datagram_flag() {
   send_datagram_flag = true; 
 }
+
+// =========================================================================
+// Setup and loop
+
+void setup() {
+  // Testing variables 
+  if (is_station) {
+    MODULE_NUM = STATION_NUM; 
+    DEST_NUM = SENSOR_NUM; 
+  } else {
+    MODULE_NUM = SENSOR_NUM; 
+    DEST_NUM = STATION_NUM; 
+  }
+
+  Serial.begin(9600);
+
+  // Reception init
+  vw_set_rx_pin(reception_pin);
+  vw_setup(2000);
+  vw_rx_start();
+  Serial.println("Reception Ready ! ");
+
+  // Sendding Pin
+  vw_set_tx_pin(sending_pin);
+  vw_setup(2000);
+  Serial.println("Sending Ready ! "); 
+
+
+
+}
+
+void loop() {
+  // Check if we need to send a datagram 
+  if (send_datagram_flag) {
+    send_datagram(); 
+  }
+  
+  // Listen for datagram reception
+  uint8_t buf[VW_MAX_MESSAGE_LEN];
+  uint8_t buflen = VW_MAX_MESSAGE_LEN;
+  
+  if (vw_get_message(buf, &buflen)) {
+    Serial.println("---| Datagram Received !");
+    // Saving received datagram
+    char* received_msg = (char*) malloc(buflen);
+    memset(received_msg, 0, buflen);
+    // Display received datagram
+    Serial.print("---| Text: ");
+    for (int i = 0; i < buflen; i++) {
+      Serial.print((char)buf[i]);
+      received_msg[i] = (char) buf[i]; 
+    }
+    Serial.println(""); 
+    // Free memory
+    free(received_msg);
+
+
+
+    Serial.println(); 
+  } 
+}
+
 
 
 

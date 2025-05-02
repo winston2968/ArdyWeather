@@ -14,21 +14,21 @@
 // Global Variables 
 
 // Communication Variables 
-int sendding_pin = 8; 
-int reception_pin = 4; 
-static char SENSOR_NUM = '2';
+#define is_station false 
+#define datagram_size 27 
+int sending_pin = 8; 
+int reception_pin = 2; 
+char MODULE_NUM = '1' ; 
+char DEST_NUM = '0' ;   // Corresponding to station in this project 
 volatile int nb_ack = 0;
-volatile int nb_ack_station = 0; 
-volatile int nb_sent = 0;
-char datas_example[] = {'H','G','F','D','J','I','Z','J','C','K','J','B','Q','K','B','Z','S','B'};
-char datagram[27]; // <- One static datagram
-bool is_sending = false;        // To suspend sending if not acquitted
-char last_datagram[27]; 
-int last_send_size = 0; 
+volatile int nb_send = 0; 
+int nb_ack_other = 0; 
+char datagram[datagram_size]; 
+char last_datagram[datagram_size]; 
+volatile bool send_datagram_flag = false ; 
 
 // 54 values × 3 char ASCII = 162, for 2 tables = 324
 char merged_table[324];
-bool send_datagram_flag = false ; 
 
 // Sendding STACK variables 
 int nb_tables_stack = 0; 
@@ -37,33 +37,28 @@ int nb_tables_stack = 0;
 float temp_table[3][18] = {0};       // To store temperatures before sendding 
 float hum_table[3][18] = {0};        // To store humidity values before sendding 
 int temp_hum_cpt = 0;                // To know if we need to send 
-bool temp_hum_flag = false; 
+volatile bool temp_hum_flag = false; 
 
 // Prototypes 
-// void update_temp_hum(); 
-// char* convert_temp_table_to_ASCII_table(float table[]); 
-// void send_temp_hum(); 
-// void build_datagram(); 
-// void send_datagram(bool resend); 
-// void datagram_decoding(char* received_msg); 
-
-
 
 // ===========================================================================
 // Setup and Loop
 
 
 void setup() {
-  Serial.begin(9600); 
+  Serial.begin(9600);
+
   // Reception init
   vw_set_rx_pin(reception_pin);
   vw_setup(2000);
   vw_rx_start();
   Serial.println("Reception Ready ! ");
+
   // Sendding Pin
-  vw_set_tx_pin(sendding_pin);
+  vw_set_tx_pin(sending_pin);
   vw_setup(2000);
-  Serial.println("Sendding Ready ! "); 
+  Serial.println("Sending Ready ! "); 
+
 
   // Hum and Temp Timer 
   Timer3.initialize(100000);
@@ -73,9 +68,6 @@ void setup() {
   // Send datas timer 
   Timer4.initialize(2000000); 
   Timer4.attachInterrupt(set_send_datagram_flag); 
-
-
-  // display_tables(); 
 
   Serial.println(); 
 }
@@ -87,11 +79,37 @@ void loop() {
     update_temp_hum();
   }
   
-  if (send_datagram_flag == true && nb_tables_stack != 0) {
+  // Check if we need to send a datagram 
+  if (send_datagram_flag && nb_tables_stack != 0) {
     send_datagram(); 
+    Serial.println(); 
+    send_datagram_flag = false; 
   }
+  
+  // Listen for datagram reception
+  uint8_t buf[VW_MAX_MESSAGE_LEN];
+  uint8_t buflen = VW_MAX_MESSAGE_LEN;
+  
+  if (vw_get_message(buf, &buflen)) {
+    Serial.println("---| Datagram Received !");
+    // Saving received datagram
+    char* received_msg = (char*) malloc(buflen);
+    memset(received_msg, 0, buflen);
+    // Display received datagram
+    Serial.print("---| Text: ");
+    for (int i = 0; i < buflen; i++) {
+      Serial.print((char)buf[i]);
+      received_msg[i] = (char) buf[i]; 
+    }
+    Serial.println(""); 
+    datagram_decoding(received_msg); 
+    // Free memory
+    free(received_msg);
 
-  // Datagram reception 
+
+
+    Serial.println(); 
+  } 
   
 }
 

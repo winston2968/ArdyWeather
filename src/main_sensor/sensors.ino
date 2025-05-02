@@ -32,9 +32,9 @@ void update_temp_hum() {
   // Reset the flag 
   temp_hum_flag = false ; 
 
-  Serial.print("Values cpt tables: "); 
-  Serial.println(temp_hum_cpt); 
-  Serial.println(); 
+  // Serial.print("Values cpt tables: "); 
+  // Serial.println(temp_hum_cpt); 
+  // Serial.println(); 
 }
 
 
