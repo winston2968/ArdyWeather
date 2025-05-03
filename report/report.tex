@@ -3,6 +3,9 @@
 % HEADER
 \input{header_report.tex}
 
+\setlength{\headheight}{52.87724pt}  % Augmenter la hauteur de l'en-tête
+\addtolength{\topmargin}{-10.19812pt}  % Réduire l'espace en haut de la page
+
 
 \begin{document}
 
@@ -30,8 +33,8 @@ Pour celui-ci, nous allons essayer de faire une station météo composée de deu
     radio pour envoyer les relevés à la station fixe. 
     Pour le capteur, on utilise un {capteur de température et d'humidité Grove} permettant 
     une connexion facile à la carte. 
-    \item \textbf{La station fixe : } Composée d'un arduino recevant les données émises par le capteur et les envoie en filaire 
-    à un carte type raspberry pour un affichage sur écran/interface web. 
+    \item \textbf{La station fixe : } Composée d'un arduino recevant les données émises par le capteur et les 
+    sauvegarde. 
 \end{itemize}
 
 Toutes les informations techniques relatives au projet (code, bibliothèques) sont disponibles sur le github : 
@@ -77,20 +80,21 @@ Dans un datagramme (ou paquet) nous devons donc envoyer :
         (\emph{Un entier encodé avec son caractèse ASCII.})
     \item \textbf{Le nombre de paquets reçus} : pour informer l'émetteur de la bonne réception des paquets. 
         (\emph{Un entier encodé avec son caractèse ASCII.})
+    \item \textbf{Deux octets de checksum }: pour être capable de détecter des paquets détériorés. 
+        (\emph{Calculés à l'aide d'une simple somme modulaire.})
     \item \textbf{Les données} : température, humidité ou rien si c'est un paquet d'acquittement. 
         (\emph{Encodées d'une certaine façon que nous détaillerons plus tard}. )
 \end{itemize}
 
 Ainsi, un datagramme classique aura le format suivant : 
     \begin{center}
-        \texttt{\{'A', 'W', Emetteur, Destinataire, Type de Paquet, Type de Données, Nb Envoyés, Nb ACK, Datas\}}
+        \texttt{\{'A', 'W', Emetteur, Destinataire, Type de Paquet, Type de Données, Nb Envoyés, Nb ACK, CHKSM1, CHKSM2, Datas\}}
     \end{center}
 Par exemple le paquet \texttt{'A','W','1','0','D','H','1','0',... }, est un datagramme envoyé 
 par le module 1 à la station (module 0). C'est un paquet de données d'humidité. Le paquet porte le numéro 1 (donc la station
 devra acquitter avec une trame d'acquittement et un numéro ACK de 1). On peut voir que la station n'a envoyé aucun paquet au 
 module numéro 1. 
-
-On peut voir, qu'une fois l'en-tête du paquet remplie, il ne nous reste "que" 18 octets pour les données dans un datagramme. 
+On peut voir, qu'une fois l'en-tête du paquet remplie, il ne nous reste "que" 16 octets pour les données dans un datagramme. 
 
 \subsection{Encodage des données}
 
@@ -104,6 +108,8 @@ il nous faudrait envoyer un nombre conséquent de paquets dont le champ de donn�
 Ainsi, nous avons choisis d'encoder ces nombres flottant sur seulement 3 octets. Pour cela, nous les multiplierons 
 par 100 pour obtenir des entiers. Entier, que l'on encodera ensuite sur 3 octets, chaque octet définis par des opérations 
 arithmétiques (voir fonction \texttt{convert\_float\_table\_to\_ASCII} du fichier \texttt{sensors.ino} du module \texttt{main\_sensor}). 
+Ces opérations ne nous permettent que d'envoyer les flottant entre $0$ et $85.54$. Donc on ne peut pas relever des températures 
+négatives...
 
 \subsection{Principe et fonctionnement}
 
@@ -113,7 +119,7 @@ L'émission des datagrammes de données sont déclenchés par les \textbf{capteu
 
 \textbf{Côté capteur}, celui-ci relève en permanence la température et l'humidité de son environnement et les stocke dans deux tables 
 \texttt{temp\_table} et \texttt{hum\_table} comme énoncé précédement. 
-Une fois ces tables suffisament remplies (on a choisis un nombre arbitraire de 54 relevés correspondant à 3 émissions radio), 
+Une fois ces tables suffisament remplies (on a choisis un nombre arbitraire de 64 relevés correspondant à $13 \times 2$ émissions radio), 
 le capteurs déclenche la séquence d'envoi de données à la station. 
 Pour cela, il dispose de la fonction \texttt{update\_temp\_hum} déclenchée par un timer qui relève les données 
 en permanence et la fonction \texttt{build\_merged\_table} qui permet de construire la \texttt{char merged\_table[]}. 
@@ -123,14 +129,14 @@ En effet, la séquence d'envoi peut être longue en fonction du temps que met la
 Il est donc indispensable de libérer les tables de relevés au cours de cet intervalle pour permettre de continuer 
 à enregistrer la température et l'humidité. 
 
-Ainsi, le capteur dispose de suffisament de temps (exactement 54 fois l'intervalle de relevés) pour envoyer les données. 
+Ainsi, le capteur dispose de suffisament de temps (exactement 26 fois l'intervalle de relevés) pour envoyer les données. 
 Passé ce temps là, la \texttt{merged\_table} est écrasée par les nouvelles données à envoyer. 
 
 L'envoi des datagrammes est déclenché par un timer. A chaque activation, le capteur vérifie dans la fonction 
 \texttt{send\_datagram} si il est en cours de séquence d'envoi et si tous les datagrammes précédents ont étés acquittés. 
 Si tel est le cas, il récupère les données à envoyer en fonction de la valeur de \texttt{nb\_tables\_stack} pointant sur 
 l'indice de départ de la séquence de \texttt{merged\_table} à envoyer. 
-Dans le cas contraire (si le précédent datagramme n'a pas été acquitté), il le renvoie via la variable \texttt{char lest\_datagram[]}
+Dans le cas contraire (si le précédent datagramme n'a pas été acquitté), il le renvoie via la variable \texttt{char last\_datagram[]}
 actualisée à chaque envoi de nouveau datagramme. 
 A noter qu'il n'est pas possible d'avoir envoyé plusieurs trames non acquittées, puisque le capteur attend toujours l'acquittement 
 de la précédente pour envoyer la suivante. 
@@ -138,8 +144,9 @@ de la précédente pour envoyer la suivante.
 \vspace{0.3cm}
 
 \textbf{Côté station}, celle-ci attend en permanence la réception de datagrammes via son module radio. 
-Une fois un datagramme réceptionné correspondant au protocole développé, elle acquitte la trame avant 
-de sauvegarder les données dans \texttt{temp\_storage} et \texttt{hum\_storage} en fonction du type de données reçues. 
+Une fois un datagramme réceptionné correspondant au protocole développé, elle calcule vérifie que les octets 
+des champs checksum correspondent bien au calcul de la trame reçue. En cas d'égalité, elle acquitte le datagramme à l'émetteur et 
+sauvegarde les données dans \texttt{temp\_storage} et \texttt{hum\_storage} en fonction de leur type. 
 
 
 
@@ -149,10 +156,59 @@ de sauvegarder les données dans \texttt{temp\_storage} et \texttt{hum\_storage}
 
 \section{Développement}
 
+Dans cette partie, nous allons détailler brièvement le processus de développement du projet ainsi que les outils 
+utilisés. 
+
 \subsection{Structure et choix}
+
+Tout d'abord, l'utilisation d'Arduino de type MEGA disposant d'un mémoire RAM de 8ko a grandement facilité 
+la gestion de la mémoire pour le stockage d'importantes quantités de données de température et d'humidité. 
+Dans un second temps, le choix de ces modules radio assez peu perfectionnés nous a poussé à repenser complètement 
+un protocole de communication fiable et solide. L'acquittement de chaque datagramme de données n'étant pas la solution 
+la plus optimale, elle reste quand même la plus fiable et simple à implémenter. 
+L'ajout de checksum rajoute une couche de sécurité supplémentaire permettant d'isoler tout paquet endommagé. 
+Enfin, l'ajout d'un dispositif de chiffrement des datagrammes aurait pu être une bonne idée mais les données envoyées 
+n'étant pas sensibles, ce n'était pas une priorité du projet. 
+
+\vspace{0.3cm}
+
+Côté techniques et outils de développement, le logiciel \href{https://www.arduino.cc/en/software/}{ArduinoIDE} 
+nous a permis de développer le projet de A à Z. Sa fiabilité et sa facilité d'utilisation en a fait un outil de choix. 
+De plus, sa capacité à inclure plusieurs fichiers dans un même sketch (projet à téléverser dans l'Arduino) a été 
+pratique pour fragmenter le code et ne pas avoir à traiter un fichier de plus de 1000 lignes. 
+Pour ce qui est de la gestion des différentes versions du projet, nous avons utilisé GitHub pour le versionnage et la 
+sauvegarde. Le projet est d'ailleurs toujours disponible sur le site via le lien en introduction. 
 
 \subsection{Améliorations}
 
+Même si le projet final reste assez complet, il est nécessaire d'aborder les différentes fonctionnalités manquantes. 
+Tout d'abord, un lecteur avisé du code remarquera rapidement que les capteurs de température et d'humidité ne sont 
+utilisés. En effet, il nous a été impossible de les faire marquer avec la bilibothèque proposée par le fabriquant. 
+Nous avons donc choisi de générer aléatoirement des valeurs pour simuler des relevés et pouvoir tester la gestion des données. 
+
+\vspace{0.3cm}
+
+D'autre part, le protocole de communication entre modules n'est pas des plus perfectionnés. Il serait plus optimal 
+que les capteurs soient capables d'envoyer plusieurs datagrammes de suite et de recevoir une seule trame 
+d'acquittement pour tous les paquets envoyés. Cela réduirait beaucoup le flux de données en transit et le 
+nombre d'acquittements à envoyer pour la station principale. 
+
+\vspace{0.3cm}
+
+Enfin, il aurait été préférable d'ajouter une option de visualisation des données via un lien station/raspberry pi 
+pour un affichage sur ordinateur. L'ajout d'affichers sur les modules ou la station aurait été préférable pour être 
+capable de visualiser ce que font les micro-contrôleurs. 
+
+
+\subsection{Processus de Test}
+
+Dans le \href{https://github.com/winston2968/ArdyWeather.git}{GitHub}, plusieurs fichiers permettent de tester 
+les différentes fonctionnalités du projet. 
+Tout d'abord, les sketchs \texttt{main\_sensor} et \texttt{main\_station} contiennent tout le code des différents 
+modules du projet. Il sont fonctionnels et leur lancement sur deux cartes ArduinoMEGA permettront d'avoir une bonne 
+vision de ce qui est possible. 
+De plus, l'ajout d'un sketch supplémentaire : \texttt{testing\_station} permet de tester uniquement le module station pour vérifier qu'il est 
+bien capable de recevoir des datagrammes de différents autres modules. 
 
 
 
