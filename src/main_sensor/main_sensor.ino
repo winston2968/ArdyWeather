@@ -16,6 +16,8 @@
 // Communication Variables 
 #define is_station false 
 #define datagram_size 27 
+#define datas_size 16
+
 int sending_pin = 8; 
 int reception_pin = 2; 
 char MODULE_NUM = '1' ; 
@@ -28,14 +30,14 @@ char last_datagram[datagram_size];
 volatile bool send_datagram_flag = false ; 
 
 // 54 values × 3 char ASCII = 162, for 2 tables = 324
-char merged_table[324];
+char merged_table[384];
 
 // Sendding STACK variables 
 int nb_tables_stack = 0; 
 
 // Weather station variables 
-float temp_table[3][18] = {0};       // To store temperatures before sendding 
-float hum_table[3][18] = {0};        // To store humidity values before sendding 
+float temp_table[4][datas_size] = {0};       // To store temperatures before sendding 
+float hum_table[4][datas_size] = {0};        // To store humidity values before sendding 
 int temp_hum_cpt = 0;                // To know if we need to send 
 volatile bool temp_hum_flag = false; 
 
@@ -91,7 +93,7 @@ void loop() {
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
   
   if (vw_get_message(buf, &buflen)) {
-    Serial.println("---| Datagram Received !");
+    Serial.println("------- Datagram Received -------"); 
     // Saving received datagram
     char* received_msg = (char*) malloc(buflen);
     memset(received_msg, 0, buflen);

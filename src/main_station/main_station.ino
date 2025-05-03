@@ -16,6 +16,8 @@
 // Radio Protocol Variables 
 #define is_station true 
 #define datagram_size 27 
+#define datas_size 16
+
 int sending_pin = 8; 
 int reception_pin = 2; 
 char STATION_NUM = '0' ; 
@@ -58,7 +60,7 @@ void loop() {
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
   
   if (vw_get_message(buf, &buflen)) {
-    Serial.println("---| Datagram Received !");
+    Serial.println("------- Datagram Received -------"); 
     // Saving received datagram
     char* received_msg = (char*) malloc(buflen);
     memset(received_msg, 0, buflen);

@@ -17,23 +17,23 @@ void update_temp_hum() {
 
   float actual_temp = (float) random(0, 40); 
   float actual_hum = (float) random(0, 100); 
-  if (temp_hum_cpt == 54) {
+  if (temp_hum_cpt == 64) {
     build_merged_table(); 
     temp_hum_cpt = 0; 
     // display_merged_table(); 
     // reset_tables();
   } 
   // Adding values to tables in every case
-  int row = temp_hum_cpt % 3;       // 3 lignes
-  int col = temp_hum_cpt / 3;       // 19 colonnes
+  int row = temp_hum_cpt % 4;       // 3 lignes
+  int col = temp_hum_cpt / 4;       // 19 colonnes
   temp_table[row][col] = actual_temp; 
   hum_table[row][col] = actual_hum; 
   temp_hum_cpt++;
   // Reset the flag 
   temp_hum_flag = false ; 
 
-  // Serial.print("Values cpt tables: "); 
-  // Serial.println(temp_hum_cpt); 
+  Serial.print("Values cpt tables: "); 
+  Serial.println(temp_hum_cpt); 
   // Serial.println(); 
 }
 
@@ -43,10 +43,10 @@ void update_temp_hum() {
   Each float value is converted to 3 ASCII char. 
 */
 
-void convert_float_table_to_ASCII(float table[3][18], char* dest) {
+void convert_float_table_to_ASCII(float table[4][16], char* dest) {
   int cpt = 0; 
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 18; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < datas_size; j++) {
       int value = (int) (table[i][j] * 100);     // Two decimals precision
 
       char c1 = (value / 91) + 33 ;
@@ -65,9 +65,9 @@ void convert_float_table_to_ASCII(float table[3][18], char* dest) {
 */
 
 void build_merged_table() {
-  convert_float_table_to_ASCII(temp_table, merged_table); 
-  convert_float_table_to_ASCII(hum_table, merged_table + 162); 
-  nb_tables_stack = 18;       // We need to send 18 tables with radio signal
+  convert_float_table_to_ASCII(temp_table, merged_table);
+  convert_float_table_to_ASCII(hum_table, merged_table + 192);
+  nb_tables_stack = 384 / 16; // We need to send 24 datagrams 
 }
 
 
@@ -77,8 +77,8 @@ void build_merged_table() {
 
 void display_tables() {
   Serial.println("===> Temp Table :"); 
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 18; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 16; j++) {
       Serial.print(temp_table[i][j], 2);
       Serial.print(" ");
     }
@@ -86,8 +86,8 @@ void display_tables() {
   }
 
   Serial.println("===> Hum Table :"); 
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 18; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 16; j++) {
       Serial.print(hum_table[i][j], 2);
       Serial.print(" ");
     }
@@ -96,7 +96,7 @@ void display_tables() {
 }
 
 void display_merged_table() {
-  for (int i = 0; i < 324; i++) {
+  for (int i = 0; i < 384; i++) {
     Serial.print(merged_table[i]); 
     Serial.print(" ");
     if (i % 20 == 0) Serial.println(); 
@@ -110,8 +110,8 @@ void display_merged_table() {
 */
 
 void reset_tables() {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 19; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 16; j++) {
       temp_table[i][j] = 0; 
       hum_table[i][j] = 0; 
     }
