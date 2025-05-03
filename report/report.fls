@@ -433,8 +433,13 @@ INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmtt10.tfm
-OUTPUT report.thm
+INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmri10.tfm
 INPUT ./images/logo_jfc.png
+INPUT ./images/logo_jfc.png
+INPUT ./images/logo_jfc.png
+INPUT ./images/logo_jfc.png
+INPUT ./images/logo_jfc.png
+OUTPUT report.thm
 INPUT ./images/logo_jfc.png
 INPUT ./images/logo_jfc.png
 INPUT ./images/logo_jfc.png
@@ -446,4 +451,5 @@ INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx10.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr10.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb
+INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb

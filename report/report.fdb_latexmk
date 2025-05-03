@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1746185322.45397 "/Users/axel/Desktop/Ardy_Weather/report/report.tex" "report.pdf" "report" 1746185324.36839 0
-  "/Users/axel/Desktop/Ardy_Weather/report/report.tex" 1746185319.65745 2553 38fbc3673661ffecd6f06f92254dfd37 ""
+["pdflatex"] 1746284815.78964 "/Users/axel/Desktop/Ardy_Weather/report/report.tex" "report.pdf" "report" 1746284817.73212 0
+  "/Users/axel/Desktop/Ardy_Weather/report/report.tex" 1746284814.97972 9142 27d9dc71efd9ca94fbdb2b4864bfe6d5 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc" 1254269338 3031 6c4d3515bf7115d8518af1c9ab97ca44 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -16,6 +16,7 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmr10.tfm" 1254269338 12056 7e13df7fe4cbce21b072ba7c4f4deb6e ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmr12.tfm" 1254269338 12092 7b1546e2d096cfd5dcbd4049b0b1ec2e ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmr17.tfm" 1254269338 12156 ca1ae6a3c8564e89597f1f993fba1608 ""
+  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmri10.tfm" 1254269338 17148 9556e1b5f936b77a796f68d2d559ba99 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmtt10.tfm" 1254269338 1372 2ef2c2b492b3c4cd7879fe083abbb061 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/lmex10.tfm" 1148093231 992 ce925c9346c7613270a79afbee98c070 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/lmmi10.tfm" 1148093231 1528 6d36b2385e0ca062a654de6ac59cb34f ""
@@ -38,6 +39,7 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb" 1255129361 116908 1fca96723793882c2e0160350c192fc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr10.pfb" 1255129361 119235 f35b44530a1d90eb90fe15d9cba67ea0 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb" 1255129361 113634 f99c44d58bae0863375faf0e1d74d612 ""
+  "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb" 1255129361 112593 fda2373ba4420af33949610de4c28fe8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb" 1255129361 113227 1010e11451afc2822c95dae77c390042 ""
   "/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2024/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1575674566 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
@@ -231,10 +233,10 @@
   "header_report.tex" 1746184928.83764 3692 905272d241d1a70f50fdaa023320feab ""
   "images/logo_arduino.png" 1742050746.97639 306975 7daa0c4d379373d3d435f537bf7779c5 ""
   "images/logo_jfc.png" 1742050671.46738 8184 c7708e8ec1a558d022fad1180423cf08 ""
-  "report.aux" 1746185324.20142 746 eefda98e78f2310afb9a04ca119336c8 "pdflatex"
-  "report.out" 1746185324.2024 425 0b01b84fc4af77b345a14662ee615efc "pdflatex"
-  "report.tex" 1746185319.65745 2553 38fbc3673661ffecd6f06f92254dfd37 ""
-  "report.toc" 1746185324.2027 335 2954e7243404dde5535d36ed5358c8a7 "pdflatex"
+  "report.aux" 1746284817.56042 1381 ad002207b415dab6838e9c51e04fff8b "pdflatex"
+  "report.out" 1746284817.56206 425 0b01b84fc4af77b345a14662ee615efc "pdflatex"
+  "report.tex" 1746284814.97972 9142 27d9dc71efd9ca94fbdb2b4864bfe6d5 ""
+  "report.toc" 1746284817.56235 765 f125ec31df58ee5e3931f85d3a26956f "pdflatex"
   "titlepage_report.tex" 1742050957.7848 722 0a18efa2e9a2a8287953b1b48a673b62 ""
   (generated)
   "report.aux"
