@@ -1,0 +1,189 @@
+\documentclass{beamer}
+
+
+% ========================================================================================
+%                                   Setting up document
+% ========================================================================================
+
+% Use personnl theme
+\usepackage{beamerthemeChampollion}
+
+% Tikz package for drawing 
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta}
+
+
+% Title and logo
+\title[]{Soutenance Mini-Projet Arduino}
+\subtitle{ArdyWeather}
+\author{Axel PIGEON}
+\institute{INU Champollion}
+\date{\today}
+\titlegraphic{\includegraphics[height=1cm]{./images/logo_jfc.png}}
+
+
+
+% ========================================================================================
+%                                   CONTENT
+% ========================================================================================
+
+\begin{document}
+
+% Titlepage 
+{
+    % \usebackgroundtemplate{\includegraphics[width=\paperwidth]{./images/background_titlepage.png}}
+    \begin{frame}
+        \titlepage
+    \end{frame}
+}
+
+% ========================================================================================
+% Introduction
+
+\section{Introduction}
+
+\begin{frame}{Introduction}
+    \begin{minipage}{0.40\textwidth}
+        \centering
+        \includegraphics[width=1.0\textwidth]{./images/logo_arduino.png}
+    \end{minipage}
+    \hfill 
+    \begin{minipage}{0.55\textwidth}
+        \begin{itemize}
+            \item Mini Projet Arduino 
+            \item Architecture des Ordinateurs, L3 Informatique
+            \item Objectif : communication entre Arduino
+            \item \href{https://github.com/winston2968/ArdyWeather.git}{Lien GitHub}
+        \end{itemize}
+    \end{minipage}
+\end{frame}
+
+% Summary 
+\begin{frame}{Plan}
+    \tableofcontents
+\end{frame}
+
+% ========================================================================================
+% Entreprise et missions
+
+\section{Principe et fonctionnement}
+
+\begin{frame}{Idée du projet}
+    \centering
+    \begin{tikzpicture}[node distance=2cm and 3cm]
+        % Station node 
+        \node[draw, ellipse] (s) at (0,4) {Station}; 
+        % Sensors node
+        \node[draw, ellipse] (c1) at (-4,1) {Capteur 1};
+        \node[draw, ellipse] (c2) at (0,-2) {Capteur 2};
+        \node[draw, ellipse] (c3) at (4,1) {Capteur 3};
+        
+        % Node links 
+        \draw[->, dashed, bend left] (c1) to (s);  
+        \draw[->, dashed, bend left] (s) to (c1); 
+        \draw[->, dashed, bend left] (c2) to (s);  
+        \draw[->, dashed, bend left] (s) to (c2);
+        \draw[->, dashed, bend left] (c3) to (s);  
+        \draw[->, dashed, bend left] (s) to (c3);
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Structure des paquets}
+    $\Longrightarrow$ Besoin d'une structure de paquets avec : 
+    \begin{itemize}
+        \item {Une séquence propre au protocole}
+        \item {Un identifiant unique pour l'émeteur}
+        \item {Un identifiant unique pour le destinataire}
+        \item {Le type du paquet}
+        \item {Le type des données envoyées}
+        \item {Le nombre de paquets déjà envoyés}
+        \item {Le nombre de paquets reçus}  
+        \item {Deux octets de checksum }
+        \item {Les données}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Structure des paquets (2)}
+    D'où le paquet suivant : 
+        \begin{center}
+            \texttt{\{'A', 'W', Emetteur, Destinataire, Type de Paquet, Type de Données, Nb Envoyés, Nb ACK, CHKSM1, CHKSM2, Datas\}}
+        \end{center}
+    Par exemple \texttt{'A','W','1','0','D','H','1','0',... }
+\end{frame}
+
+\begin{frame}{Encodage des données}
+    \centering 
+    Idée : \texttt{float table[4][16]}  $\longrightarrow$ 3 char ASCII dans $[33, 126]$
+    
+    \raggedright
+
+    \vspace{0.7cm}
+
+
+    Soit  $ V = \texttt{int}(100 \times \texttt{table[i][j]}) $ on pose alors : 
+    $ V = a \cdot 91 + b \cdot 10 + c$ avec :
+        \[ 
+            \begin{cases}
+                a = \left\lfloor \frac{V}{91} \right\rfloor \\
+                b = \left\lfloor \frac{V \bmod 91}{10} \right\rfloor \\
+                c = V \bmod 10 \\
+            \end{cases}
+            \Longrightarrow
+            \begin{cases}
+                c_1 = a + 33 \quad (\text{caractère ASCII}) \\
+                c_2 = b + 33 \\
+                c_3 = c + 33
+            \end{cases}
+        \]
+\end{frame}
+
+\begin{frame}{Calcul plage d'encodage}
+    On encode un entier \texttt{value} (issu de \texttt{float}) sur 3 ASCII tel que : 
+    \[ 
+        \begin{cases}
+            a = \texttt{value} \times 91 \Longrightarrow \max(a) = 126 - 33 = 93 \\ 
+            b = (\texttt{value} \mod 91) / 10 \Longrightarrow \max(b) = 126 - 33 = 93 \\ 
+            c = \texttt{value} \mod 10  \Longrightarrow \max(c) = 9
+        \end{cases}
+    \] 
+    Tel que $ \texttt{value} = a \times 91 + b \times 10 + c $. 
+    Avec : 
+        \[ a \in [0, 93], \quad b \in [0, 9], \quad c \in [0, 9] \] 
+    Donc : 
+        \[ \texttt{value}_{\text{max}} = 8562 \quad \text{ i.e } \; 85.62 \] 
+    
+\end{frame}
+
+% ========================================================================================
+% Démonstration
+
+\section{Démonstration}
+
+\begin{frame}{Démonstration}
+    \centering 
+    \includegraphics[width=0.3\textwidth]{images/loading_icon.jpg}
+\end{frame}
+
+% ========================================================================================
+% Conclusion
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item[-] Difficulté lié au peu de ressources disponibles. 
+        \item[-] Langage C difficile. 
+        \item[-] Capteurs Temp/Hum pas intégrés. 
+        \item[+] Projet très intéressant.  
+        \item[+] Développement d'un protocole de communication. 
+        \item[+] Thème Beamer pour Champollion réussis ! 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Questions ?}
+    \centering
+    \huge Merci pour votre attention !
+\end{frame}
+
+\end{document}

@@ -4,5 +4,10 @@ report/report.*
 !report/report.tex
 .DS_Store
 
+report/presentation.*
+!report/presentation.tex
+!report/presentation.pdf 
+!report/beamerthemeChampollion.sty
+
 
 

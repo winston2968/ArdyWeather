@@ -1,0 +1,166 @@
+\ProvidesPackage{beamerthemeChampollion}
+
+% Load base theme 
+\usetheme{Madrid} 
+\useoutertheme{infolines}  % or split, miniframes, etc.
+
+% Import packages 
+\usepackage{tikz}
+\usepackage{eso-pic}
+\usepackage{graphicx}
+
+% ==============================================================================
+%                                   COLORS
+% ==============================================================================
+
+% ----------------- Define colors -----------------
+
+\definecolor{champollionBlue}{HTML}{5D3786}
+\definecolor{champollionOrange}{HTML}{EC603F}
+\definecolor{champollionRed}{HTML}{D22D4D}
+\definecolor{champollionGrayDark}{HTML}{777777}
+\definecolor{champollionGrayLight}{HTML}{E2E3E4}
+
+% ----------------- Apply colors -----------------
+
+\usecolortheme[named=champollionGrayDark]{structure}
+
+% Text and background 
+% \setbeamercolor{normal text}{fg=black}
+% \setbeamercolor{background canvas}{bg=champollionGrayLight}
+% \setbeamercolor{alertblock}{bg=red!50,fg=white}
+% \setbeamercolor{exampleblock}{bg=blue!50,fg=white}
+
+% Title and en-têtes
+\setbeamercolor{title}{fg=white,bg=champollionOrange}
+\setbeamercolor{subtitle}{fg=champollionRed}
+\setbeamercolor{section in toc}{fg=black}
+\setbeamercolor{subsection in toc}{fg=black}
+\setbeamercolor{frametitle}{fg=white,bg=champollionOrange}
+
+
+% Links and hyperlinks 
+% \setbeamercolor{item}{fg=champollionBlue}  % For liste elements
+% \setbeamercolor{link}{fg=champollionRed}   % For links
+% \setbeamercolor{url}{fg=blue,underline=true}
+
+% List, itemize and enumeration 
+% \setbeamercolor{itemize item}{fg=champollionBlue}
+% \setbeamercolor{enumerate item}{fg=champollionRed}
+
+% Notes and citation blocs
+% \setbeamercolor{block title}{bg=champollionRed, fg=white}
+% \setbeamercolor{block body}{bg=champollionGray, fg=black}
+% \setbeamercolor{quote}{fg=gray}
+
+% Navigation symbols 
+\setbeamercolor{navigation symbols}{fg=champollionBlue}
+\setbeamercolor{headline}{bg=champollionGrayDark}
+\setbeamercolor{footline}{bg=champollionGrayLight,fg=champollionGrayDark}
+
+% Bloc structure 
+\setbeamercolor{block title}{bg=champollionGrayDark,fg=white}
+\setbeamercolor{block body}{bg=champollionGrayLight,fg=black}
+
+% ==============================================================================
+%                                   FONTS
+% ==============================================================================
+
+% Option : modify font
+% \usepackage{helvet}
+% \renewcommand{\familydefault}{\sfdefault}
+
+\setbeamerfont{title}{size=\huge, series=\bfseries}
+\setbeamerfont{subtitle}{size=\Large, series=\mdseries}
+\setbeamerfont{author}{size=\Large, series=\mdseries}
+\setbeamerfont{date}{size=\large, series=\mdseries}
+
+
+% ==============================================================================
+%                                   TITLEPAGE
+% ==============================================================================
+
+% Adding and formatting content for titlepage
+\setbeamertemplate{title page}{
+    \begin{center}
+        \begin{minipage}[c]{0.4\textwidth}
+            \includegraphics[width=0.7\linewidth]{./images/logo_jfc.png}
+            
+            Institut National \\ 
+            Universitaire \\
+            \textbf{Champollion}
+            \vfill
+        \end{minipage}
+        \hfill 
+        \begin{minipage}[c]{0.5\textwidth}
+            \vspace{1.5cm}
+            {\color{champollionOrange}\usebeamerfont{title}\inserttitle\par}
+            \vspace{0.3cm}
+            {\color{champollionOrange}\usebeamerfont{subtitle}\insertsubtitle\par}
+            \vspace{0.3cm}
+            {\color{champollionOrange}\usebeamerfont{author}\insertauthor\par}
+            {\color{champollionOrange}\usebeamerfont{date}\insertdate\par}
+        \end{minipage}
+    \end{center}
+}
+
+% \setbeamertemplate{title page}{
+%     \vbox{}
+%     \vfill
+%     \begin{center}
+%         \usebeamerfont{title}\inserttitle\par
+%         \vskip1em\usebeamerfont{subtitle}\insertsubtitle\par
+%         \vskip2em\insertauthor\par
+%         \insertdate\par
+%     \end{center}
+%     \vfill
+% }
+
+% ==============================================================================
+%                                    FOOTNOTE
+% ==============================================================================
+
+\setbeamertemplate{footline}{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.7\paperwidth,ht=2.5ex,dp=1.125ex,left]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\hspace*{2ex}\insertauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.5ex,dp=1.125ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2ex}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+
+% ==============================================================================
+%                                   LOGO
+% ==============================================================================
+
+\pgfdeclareimage[height=0.7cm]{logo}{./images/logo_jfc.png}
+\logo{\pgfuseimage{logo}}
+
+
+% ==============================================================================
+%                                 OTHER ENVS
+% ==============================================================================
+
+
+% Set itemize colors and template
+\setbeamertemplate{itemize item}{\color{champollionOrange}$\bullet$}
+\setbeamertemplate{itemize subitem}{\color{champollionOrange}$\bullet$}
+\setbeamertemplate{itemize subsubitem}{\color{champollionOrange}\tiny$\blacksquare$}
+
+% Set enumerate colors and template 
+\setbeamertemplate{enumerate item}{\color{champollionOrange}\insertenumlabel.}
+\setbeamertemplate{enumerate subitem}{\color{champollionOrange}\insertenumlabel)}
+
+% Set tableofcontent colors and template 
+\setbeamertemplate{section in toc}[circle]
+\setbeamertemplate{subsection in toc}[square]
+
+% Set beamer frametitle 
+\setbeamertemplate{frametitle}{
+  \begin{beamercolorbox}[rounded=true,shadow=true,wd=\paperwidth,sep=1ex]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+  \end{beamercolorbox}
+}
