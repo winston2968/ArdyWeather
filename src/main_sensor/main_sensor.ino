@@ -104,7 +104,9 @@ void loop() {
       received_msg[i] = (char) buf[i]; 
     }
     Serial.println(""); 
-    datagram_decoding(received_msg); 
+    if (received_msg[0] == 'A' && received_msg[1] == 'W') {
+      datagram_decoding(received_msg); 
+    }
     // Free memory
     free(received_msg);
 

@@ -99,19 +99,19 @@ void datagram_decoding(char* received_msg) {
     uint16_t result = (uint16_t)(sum & 0xFFFF) ; 
     if (received_checksum = result) {
       // We need to acquit the received datagram
-      Serial.println("---| Checksum valid !"); 
+      Serial.println("*** Checksum valid ! ***"); 
       nb_ack = nb_send_msg; 
       send_acquitment(msg_emetor); 
+      // Process datas
+    add_to_storage(received_msg, received_msg[5]);  
     } else {
-      Serial.println("---| Checksum Invalid !"); 
-      Serial.print("Received : "); 
+      Serial.println("*** Checksum Invalid ! ***"); 
+      Serial.print("---| Received : "); 
       Serial.println(received_checksum); 
-      Serial.print("Calculated : "); 
+      Serial.print("---| Calculated : "); 
       Serial.println(result); 
     }
   }
-  // Process datas
-  // TODO : process datas depending on module. 
 }
 
 /*

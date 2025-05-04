@@ -72,7 +72,9 @@ void loop() {
     }
     Serial.println(); 
     // Decoding datagram and send acquitment 
-    datagram_decoding(received_msg); 
+    if (received_msg[0] == 'A' && received_msg[1] == 'W') {
+      datagram_decoding(received_msg); 
+    }
     // Free memory
     free(received_msg);
 
