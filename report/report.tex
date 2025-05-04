@@ -21,8 +21,9 @@
 
 \justify
 
-\subsection{Introduction}
+\newpage 
 
+\subsection*{Introduction}
 
 Ici est présenté le projet d'Architecture des Ordinateurs 2. Le projet consiste à développer un outil ou un jeu 
 utilisant des connexion arduino/arduino ou arduino/raspberry. 
@@ -37,16 +38,14 @@ Pour celui-ci, nous allons essayer de faire une station météo composée de deu
     sauvegarde. 
 \end{itemize}
 
-Toutes les informations techniques relatives au projet (code, bibliothèques) sont disponibles sur le github : 
+Toutes les informations techniques relatives au projet (code, bibliothèques) sont disponibles sur le Github : 
 \begin{center}
     \href{https://github.com/winston2968/ArdyWeather.git}{https://github.com/winston2968/ArdyWeather.git}
 \end{center}
 
 L'objectif est de programmer la station pour qu'elle puisse interragir avec plusieurs 
 stations. 
-
-
-\newpage 
+ 
 
 % ==================================================================================================================================
 % Présentation et principe général
@@ -69,12 +68,12 @@ Dans un datagramme (ou paquet) nous devons donc envoyer :
         (\emph{Nous choisirons pour cela deux caractères en début de datagramme : 'A' et 'W'. })
     \item \textbf{Un identifiant unique pour l'émeteur} du paquet. 
         (\emph{Un nombre entier correspondant au numéro du module. La station (qui reçoit les données 
-        des capteurs) aura le nnuméro '0'.})
+        des capteurs) aura le numéro '0'.})
     \item \textbf{Un identifiant unique pour le destinataire} du paquet. 
         (\emph{Idem que pour les émetteurs.})
     \item \textbf{Le type du paquet} soit des données ou simplement un paquet d'acquittement. 
         (\emph{On prendra 'D' pour un paquet de données et 'A' pour une trame d'acquittement. })
-    \item \textbf{Le type des données envoyée} le cas échéant, pour différencier les données de température et d'humidité. 
+    \item \textbf{Le type des données envoyées} le cas échéant, pour différencier les données de température et d'humidité. 
         (\emph{De même que précédement, on choisira 'T' pour température ou 'H' pour humidité. })
     \item \textbf{Le nombre de paquets déjà envoyés} : pour permettre de détecter un problème de réception. 
         (\emph{Un entier encodé avec son caractèse ASCII.})
@@ -86,19 +85,20 @@ Dans un datagramme (ou paquet) nous devons donc envoyer :
         (\emph{Encodées d'une certaine façon que nous détaillerons plus tard}. )
 \end{itemize}
 
-Ainsi, un datagramme classique aura le format suivant : 
+Ainsi, un datagramme classique aura donc le format suivant : 
     \begin{center}
         \texttt{\{'A', 'W', Emetteur, Destinataire, Type de Paquet, Type de Données, Nb Envoyés, Nb ACK, CHKSM1, CHKSM2, Datas\}}
     \end{center}
 Par exemple le paquet \texttt{'A','W','1','0','D','H','1','0',... }, est un datagramme envoyé 
 par le module 1 à la station (module 0). C'est un paquet de données d'humidité. Le paquet porte le numéro 1 (donc la station
 devra acquitter avec une trame d'acquittement et un numéro ACK de 1). On peut voir que la station n'a envoyé aucun paquet au 
-module numéro 1. 
+module numéro 1. Les octets de checksum sont envoyés directement sous forme binaire sans formattage ASCII. 
+Cela ne permet pas de les visualiser dans le moniteur série.   
 On peut voir, qu'une fois l'en-tête du paquet remplie, il ne nous reste "que" 16 octets pour les données dans un datagramme. 
 
 \subsection{Encodage des données}
 
-Les données de température et d'humidité relevés par les capteurs des modules sont des numbres flottant. 
+Les données de température et d'humidité relevées par les capteurs des modules sont des nombres flottant. 
 Dans le module relevant les données, on les stocke donc sous forme de tableau de flottant, \texttt{float temp\_table[]}
 et \texttt{float hum\_table[]} dans le code. 
 Pour des données d'humidité et de température, nous n'avons besoin d'une précision à seulement deux décimales. 
@@ -119,7 +119,7 @@ L'émission des datagrammes de données sont déclenchés par les \textbf{capteu
 
 \textbf{Côté capteur}, celui-ci relève en permanence la température et l'humidité de son environnement et les stocke dans deux tables 
 \texttt{temp\_table} et \texttt{hum\_table} comme énoncé précédement. 
-Une fois ces tables suffisament remplies (on a choisis un nombre arbitraire de 64 relevés correspondant à $13 \times 2$ émissions radio), 
+Une fois ces tables suffisament remplies (on a choisis un nombre arbitraire de 64 relevés correspondant à $24$ émissions radio en tout), 
 le capteurs déclenche la séquence d'envoi de données à la station. 
 Pour cela, il dispose de la fonction \texttt{update\_temp\_hum} déclenchée par un timer qui relève les données 
 en permanence et la fonction \texttt{build\_merged\_table} qui permet de construire la \texttt{char merged\_table[]}. 
@@ -129,11 +129,11 @@ En effet, la séquence d'envoi peut être longue en fonction du temps que met la
 Il est donc indispensable de libérer les tables de relevés au cours de cet intervalle pour permettre de continuer 
 à enregistrer la température et l'humidité. 
 
-Ainsi, le capteur dispose de suffisament de temps (exactement 26 fois l'intervalle de relevés) pour envoyer les données. 
+Ainsi, le capteur dispose de suffisament de temps (exactement 24 fois l'intervalle de relevés) pour envoyer les données. 
 Passé ce temps là, la \texttt{merged\_table} est écrasée par les nouvelles données à envoyer. 
 
 L'envoi des datagrammes est déclenché par un timer. A chaque activation, le capteur vérifie dans la fonction 
-\texttt{send\_datagram} si il est en cours de séquence d'envoi et si tous les datagrammes précédents ont étés acquittés. 
+\texttt{send\_datagram} s'il est en cours de séquence d'envoi et si tous les datagrammes précédents ont étés acquittés. 
 Si tel est le cas, il récupère les données à envoyer en fonction de la valeur de \texttt{nb\_tables\_stack} pointant sur 
 l'indice de départ de la séquence de \texttt{merged\_table} à envoyer. 
 Dans le cas contraire (si le précédent datagramme n'a pas été acquitté), il le renvoie via la variable \texttt{char last\_datagram[]}
@@ -144,10 +144,113 @@ de la précédente pour envoyer la suivante.
 \vspace{0.3cm}
 
 \textbf{Côté station}, celle-ci attend en permanence la réception de datagrammes via son module radio. 
-Une fois un datagramme réceptionné correspondant au protocole développé, elle calcule vérifie que les octets 
+Une fois un datagramme réceptionné correspondant au protocole développé, elle vérifie que les octets 
 des champs checksum correspondent bien au calcul de la trame reçue. En cas d'égalité, elle acquitte le datagramme à l'émetteur et 
 sauvegarde les données dans \texttt{temp\_storage} et \texttt{hum\_storage} en fonction de leur type. 
 
+
+\subsection{Fonctions Principales du protocole}
+
+Détaillons les principales fonctions du protocole décris ci-dessus. 
+
+\begin{lstlisting}
+void build_datagram(char destination, char datagram_type, char datas_type) {
+    // We will send next datagram 
+    if (datagram_type == 'D') {
+        nb_send += 1; 
+    }
+    if (nb_send == 30) {
+        nb_send = 0; 
+    }
+    
+    // Re-init datagram values
+    memset(datagram, 0, sizeof(datagram)); 
+    // Define datagram header
+    datagram[0] = 'A'; 
+    datagram[1] = 'W'; 
+    datagram[2] = destination; 
+    datagram[3] = MODULE_NUM; 
+    datagram[4] = datagram_type; 
+    datagram[5] = datas_type; 
+    datagram[6] = '0' + nb_send; 
+    datagram[7] = '0' + nb_ack;  
+    // Fill-in datas 
+    Serial.print("---| Tables Stack : ");
+    Serial.println(nb_tables_stack);
+    for (int i = 0; i < 16; i++) {
+        datagram[i + 10] = merged_table[i + (16 * (nb_tables_stack - 1))];
+    }
+    // Calculate checksum 
+    uint32_t sum = 0; 
+    for (int i = 0; i < datagram_size; i++) {
+        sum += (uint8_t) datagram[i]; 
+    }
+    uint16_t result = (uint16_t)(sum & 0xFFFF) ; 
+    datagram[8] = (result >> 8) & 0xFF;
+    datagram[9] = result & 0xFF;
+    }
+\end{lstlisting}
+
+Cette fonction, présente dans chaque modules (station ou capteurs) permet de construire un datagramme, 
+soit pour l'envoi de données ou l'acquittement d'une trame de données. 
+Un datagramme est stocké dans la variable globale \texttt{char datagram[]}. 
+Dans cette fonction, on réduit le compteur de paquets envoyés (et donc d'acquittement) à 30 pour ne pas 
+avoir d'entier trop grand et donc dépasser l'octet alloué dans le datagramme. 
+On réinitialise ensuite le datagramme à envoyer que l'on remplit avec les données d'en-tête. 
+Enfin, en fonction du type de datagramme on remplit ou pas le champ de données. 
+A noter que la valeurs du checksum est calculée sans les octets de checksum dans l'en-tête. 
+
+\begin{lstlisting}
+void send_datagram() {
+    Serial.println("------- Sending Datagram Process Lauched -------"); 
+    // Get/build datagram to send 
+    if (nb_send == nb_ack_other) {
+        // We can send a new datagram
+        if (nb_tables_stack < 24) {
+            build_datagram(DEST_NUM, 'D', 'T'); 
+        } else {
+            build_datagram(DEST_NUM, 'D', 'H'); 
+        }
+        Serial.println("---| Sending a new datagram"); 
+    } else {
+        // We need to re-send last datagram
+        memcpy(datagram, last_datagram, datagram_size); 
+        Serial.println("Re-sending last datagram"); 
+    }
+    // Send datagram 
+    vw_send((uint8_t *)datagram, datagram_size);
+    vw_wait_tx();
+    // Keep datagram on buffer
+    memcpy(last_datagram, datagram, datagram_size); 
+    Serial.println("---| Datagram Send Succesfully !");
+    }
+\end{lstlisting}
+
+Cette fonction appelée à chaque déclenchement du Timer permet d'initialiser la séquence d'envoi d'un datagramme. 
+En fonction de l'acquittement du datagramme précédent, on construit un nouveau datagramme ou pas. 
+Ici, on sauvegarde bien entendu le datagramme envoyé en cas de non acquittement. 
+
+\begin{lstlisting}
+void convert_float_table_to_ASCII(float table[4][16], char* dest) {
+  int cpt = 0; 
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < datas_size; j++) {
+      int value = (int) (table[i][j] * 100);     // Two decimals precision
+
+      char c1 = (value / 91) + 33 ;
+      char c2 = ((value % 91) / 10) + 33;
+      char c3 = (value % 10) + 33 ; 
+
+      dest[cpt++] = c1; 
+      dest[cpt++] = c2; 
+      dest[cpt++] = c3; 
+    }
+  }
+}
+\end{lstlisting}
+
+Ici, on convertit les données de température et d'humidité initialement en \texttt{float} en trois caractères 
+ASCII pour l'envoi par signal radio. Cette fonction est utilisée par \texttt{build\_merged\_table}. 
 
 
 
@@ -182,8 +285,8 @@ sauvegarde. Le projet est d'ailleurs toujours disponible sur le site via le lien
 \subsection{Améliorations}
 
 Même si le projet final reste assez complet, il est nécessaire d'aborder les différentes fonctionnalités manquantes. 
-Tout d'abord, un lecteur avisé du code remarquera rapidement que les capteurs de température et d'humidité ne sont 
-utilisés. En effet, il nous a été impossible de les faire marquer avec la bilibothèque proposée par le fabriquant. 
+Tout d'abord, un lecteur avisé du code remarquera rapidement que les capteurs de température et d'humidité ne sont pas 
+utilisés. En effet, il nous a été impossible de les faire marquer avec la bibliothèque proposée par le fabriquant. 
 Nous avons donc choisi de générer aléatoirement des valeurs pour simuler des relevés et pouvoir tester la gestion des données. 
 
 \vspace{0.3cm}
@@ -196,8 +299,8 @@ nombre d'acquittements à envoyer pour la station principale.
 \vspace{0.3cm}
 
 Enfin, il aurait été préférable d'ajouter une option de visualisation des données via un lien station/raspberry pi 
-pour un affichage sur ordinateur. L'ajout d'affichers sur les modules ou la station aurait été préférable pour être 
-capable de visualiser ce que font les micro-contrôleurs. 
+pour un affichage sur ordinateur. L'ajout d'afficheurs sur les modules ou la station aurait été agréable pour être 
+capable de visualiser ce que font les micro-contrôleurs en temps réel. 
 
 
 \subsection{Processus de Test}
@@ -217,6 +320,17 @@ bien capable de recevoir des datagrammes de différents autres modules.
 
 \section{Conclusion}
 
+Il y a plusieurs choses à dire pour cette conclusion. 
+Tout d'abord, le développement de A à Z d'un protocole radio pour Arduino nous permis de nous poser des questions 
+fondamentales en télécommunication. Questions concernant la gestion de l'acquittement des trames, de 
+la fiabilité via les checksum ainsi que la gestion de la temporisation entre envoyer des données et écouter les 
+datagrammes reçus. 
+La mise en place de toutes ces contraintes nous a poussé à revoir de nombreuses fois la structure des datagrammes, 
+allouant une place importante pour l'en-tête de ces derniers au mépris des données. 
+Enfin, le fait de devoir programmer des choses relativement complexes sur des micro-contrôleurs aux capacités 
+limitées, a rendu le développement plus intéressant. 
+Le langage C, à la base de l'Arduino est un langage parfait pour ce genre de tâches, il permet de manipuler 
+finement les variables ainsi que la gestion de la mémoire. 
 
 
 \end{document}

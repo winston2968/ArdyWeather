@@ -54,9 +54,9 @@
 \cellspacetoplimit=5pt
 \cellspacebottomlimit=5pt
 
-\setcounter{tocdepth}{1} % N'affiche que les sections (niveau 1)
-\setlength{\cftsecnumwidth}{2em} % Largeur des numéros de section
-\setlength{\cftsecindent}{0em}   % Pas d'indentation pour les sections
+% \setcounter{tocdepth}{1} % N'affiche que les sections (niveau 1)
+% \setlength{\cftsecnumwidth}{2em} % Largeur des numéros de section
+% \setlength{\cftsecindent}{0em}   % Pas d'indentation pour les sections
 
 % MATHS SHORTHANDS
 
@@ -151,4 +151,27 @@
 
 \setlength{\headheight}{1.5cm} % Ajuste la hauteur de l'en-tête
 
+% Define arduino color for code blocs 
 
+\lstdefinelanguage{Arduino}{
+  language=C++,
+  morekeywords={analogRead, digitalWrite, pinMode, delay, HIGH, LOW, INPUT, OUTPUT, Serial, setup, loop},
+  sensitive=true
+}
+
+\lstset{
+  language=Arduino,
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  frame=single,
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false
+}
