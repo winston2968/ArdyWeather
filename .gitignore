@@ -1,9 +1,8 @@
-# Exclure les fichiers de build sauf les PDF
-report/main.*
-!report/main.pdf
-!report/main.tex
+# Exclude build files 
+report/report.*
+!report/report.pdf
+!report/report.tex
 .DS_Store
 
-# Exclure les fichiers de compilation spécifiques aux chapitres
-subjects/*/.aux
+
 
